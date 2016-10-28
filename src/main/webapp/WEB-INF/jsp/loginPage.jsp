@@ -3,32 +3,24 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html >
-<head>
-<meta charset="UTF-8">
-<title>Login Form</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/CSS" href="CSS/style.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</head>
-<body>
-<form:form modelAttribute="loginPage" role="form" class="form-signin">
-  <div class="container">
-      <div class="container"><h2 class="form-signin-heading">Please login</h2></div>
-      <br>
-      <div class="col-sm-3">
-      <input type="text" class="form-control" name="username" placeholder="Enter username" required/></div>
-      <br><br><br>
-      <div class="col-sm-3">
-      <input type="password" class="form-control" name="userPassword" placeholder="Enter Password" required/></div>      
-      <input type="hidden" name="_csrf" value="${_csrf.token}">
-      <br><br><br>
-      <div class="container">
-    	<input type="submit" class="btn btn-lg btn-info collapsed" value="Login" >
-	  </div>   
-	  <br><br>
+  <head>
+    <meta charset="UTF-8">
+    <title>Login Form</title>
+	<link rel="stylesheet" type="text/CSS" href="CSS/style.css">
+  </head>
+  <body>
+  <form action="login" method="post">
+    <div class="login">
+	<h1>Login</h1>
+	
+	Username : <input type="text" name="username" id="username" required/><br><br>
+	Password : <input type="password" name="password" id="password" required/><br><br>
+	<input type="hidden" name="_csrf" value="${_csrf.token}">
+	<button type="submit" class="btn btn-primary btn-block btn-large" name="login" value="Login" >Let me in.</button>
+	<br><br>
 	<a href="PatientRegistration.html">New Patient ? Sign-up here</a>
-  </div>
-</form:form>
+ 
+</div>
+</form>
   </body>
 </html>

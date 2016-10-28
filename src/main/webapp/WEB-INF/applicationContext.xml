@@ -37,15 +37,25 @@
     <tx:annotation-driven />
 
     <context:component-scan base-package="myDentist.model" />
+    <context:component-scan base-package="myDentist.security" />
+    
     <security:authentication-manager>
         <security:authentication-provider>
             <security:jdbc-user-service data-source-ref="dataSource" />
         </security:authentication-provider>
     </security:authentication-manager>
+    
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userService" />
+    </security:authentication-manager>
 
     <security:http auto-config="true" use-expressions="true">
-   		<security:form-login login-page="/loginPage.html" />
+    	
+     <security:csrf disabled="true" />
+        <security:form-login login-page="/loginPage.html" />
         <security:logout logout-success-url="/" />
+        <security:intercept-url pattern="/users/**"  access="hasAnyRole('ROLE_ADMIN','ROLE_USER')" />
     </security:http>
+	
 
 </beans>
