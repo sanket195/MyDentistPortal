@@ -54,7 +54,7 @@ public class appointmentController {
 		
 	}
 	
-	@RequestMapping(value="/appointment.html", method=RequestMethod.GET)
+	@RequestMapping(value="/users/appointment.html", method=RequestMethod.GET)
 	public String takeAppointment(ModelMap models,@RequestParam Integer userid)
 	{
 		List listA = new ArrayList();
@@ -65,11 +65,11 @@ public class appointmentController {
 		models.put("doctors", doctorDao.getDoctors());
 		//System.out.println("doctor"+doctorDao.getDoctor(102).getDoctorName());
 		models.put("userid", userid);
-		return "appointment";
+		return "/users/appointment";
 		
 	}
 	
-	@RequestMapping(value="/appointment.html",method=RequestMethod.POST)
+	@RequestMapping(value="/users/appointment.html",method=RequestMethod.POST)
 	public String takeAppointment(@ModelAttribute("appointments") Appointments appointment,@RequestParam Integer userid,BindingResult results,@ModelAttribute ("doctors") Doctor doctors)
 	{		
 		System.out.println("-------------"+userid);
@@ -79,20 +79,20 @@ public class appointmentController {
 		//appointment.setDoctorId(doctorDao.getDoctor(doctorId));		
 		System.out.println("value is :"+appointment.getAppointmentDate());
 		appointment=appointmentsDao.saveAppointment(appointment);
-		return "redirect:PatientHome.html?userid="+userid;		
+		return "redirect:profile.html?userid="+userid;		
 	}
 	
-	@RequestMapping(value="/rescheduleAppointment.html",method=RequestMethod.GET)
+	@RequestMapping(value="/users/rescheduleAppointment.html",method=RequestMethod.GET)
 	public String rescheduleAppointment(ModelMap models,@RequestParam Integer id)
 	{
 		Appointments app = appointmentsDao.getAppointment(id);
 		System.out.println("usssssssssssssssssssssseris"+app.getUserId());
 		models.put("userid", app.getUserId());
 		models.put("appointments", appointmentsDao.getAppointment(id));
-		return "rescheduleAppointment";
+		return "/users/rescheduleAppointment";
 	}
 	
-	@RequestMapping(value="/rescheduleAppointment.html",method=RequestMethod.POST)
+	@RequestMapping(value="/users/rescheduleAppointment.html",method=RequestMethod.POST)
 	public String rescheduleAppointment(@ModelAttribute("appointments") Appointments appointment,@RequestParam Integer userid,@RequestParam Integer appid)
 	{
 		//System.out.println("userrrrrrrrrrrrrrrrrrrrr-----"+appointmentsDao.getappointmentId(id));
@@ -107,7 +107,7 @@ public class appointmentController {
 		appointment.setUserId(ap.getUserId());
 		//appointment.setAppointmentId();
 		appointment = appointmentsDao.saveAppointment(appointment);
-		return "redirect:PatientHome.html?userid="+userid;
+		return "redirect:profile.html?userid="+userid;
 	}
 
 }

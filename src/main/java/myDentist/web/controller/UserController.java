@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.omg.CORBA.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -46,61 +47,13 @@ public class UserController {
 		return "display";
 	}
 	
-	@RequestMapping("/logout.html")
-	public String loginOut(HttpSession session)
-	{	
-		//if(session!=null)
-		session.invalidate();
-		//models.put("users", userDao.getUsers());
-		return "logout.html";
-	}
+	
 	
 	@RequestMapping("/adminHome.html")
 	public String adminHome(ModelMap models)
 	{
 		models.put("appointments", appointmentsDao.getAppointments());
 		return "adminHome";
-	}
-	
-	@RequestMapping(value="/loginPage.html", method=RequestMethod.GET)
-	public String loginPage(ModelMap models)
-	{	
-		models.put("users", userDao.getUsers());
-		return "loginPage";
-	}
-	int uid=0;
-	@RequestMapping(value="/loginPage.html", method=RequestMethod.POST)
-	public String loginPage(@ModelAttribute ("user") User user,BindingResult result, ModelMap models,SessionStatus status)
-	{	
-		System.out.println(user.getUsername());
-		System.out.println(user.getUserPassword());
-		System.out.println(user.getUserType());
-		
-		for(User u : userDao.getUsers()){
-			if(user.getUsername().equals(u.getUsername())&& user.getUserPassword().equals(u.getUserPassword())){
-				if(u.getUserType().equals("patient")){
-					models.put("userid", u.getUserId());
-					//uid=u.getUserId();
-					status.setComplete();
-					return "redirect:PatientHome.html";
-				}else if(u.getUserType().equals("doctor")){
-					models.put("userid", u.getUserId());
-					uid=u.getUserId();
-					status.setComplete();
-					return "redirect:doctorHome.html";
-				}else if(u.getUserType().equals("admin")){
-					uid=u.getUserId();
-					status.setComplete();
-					return "redirect:adminHome.html";
-				}
-			}
-				
-		}
-		if(!result.hasErrors()){
-			return "loginPage.html";
-		}
-		
-		return "loginPage.html";
 	}
 	
 	

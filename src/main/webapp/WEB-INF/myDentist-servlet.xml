@@ -13,6 +13,9 @@
     <mvc:annotation-driven />
 
     <context:component-scan base-package="myDentist.web" />
+    
+    <mvc:view-controller path="/profile.html" view-name="profile" />
+    <mvc:view-controller path="/loginPage.html" view-name="loginPage" />
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/" />

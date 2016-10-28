@@ -94,6 +94,7 @@
 <input name="_csrf" type="hidden" value="${_csrf.token}"/>
 <div class="container">
   <input type="submit" class="btn btn-lg btn-info collapsed" value="Logout" >
+  <a href="<c:url value='/logout' />">Logout</a>
 </div>
 </form>
 </body>

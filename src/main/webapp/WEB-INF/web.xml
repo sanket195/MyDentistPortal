@@ -2,7 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="myDentist" version="3.0">
   <display-name>myDentist</display-name>
   <welcome-file-list>
-    <welcome-file>loginPage.html</welcome-file>
+    <welcome-file>users/profile.html</welcome-file>
   </welcome-file-list>
   <servlet>
     <servlet-name>myDentist</servlet-name>
