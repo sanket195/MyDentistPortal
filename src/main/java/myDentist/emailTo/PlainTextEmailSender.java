@@ -33,6 +33,8 @@ public class PlainTextEmailSender {
 	@Autowired
 	userDao userDao;
 	
+	//@Scheduled(cron="*/20 * * * * ?")
+	
 	@Scheduled(cron="0 0 10 * * *")
 	public void GetAllAppointments(){
 		
@@ -83,13 +85,13 @@ public class PlainTextEmailSender {
 		String port = "587";
 		final String  username = "mydentist70@gmail.com";
 		final String password = "myDentist1234";
-		sendAddress="sanket176@gmail.com";
+		//sendAddress="sanket176@gmail.com";
 		// outgoing message information
 		String subject = "Appointment Notification";
 		String message = "Hello"+pateintName+",\n\n"
 							+ "Your appointment is scheduled for tommorow between "+slot+" with "+doctorName+"\n\n"
 							+ "\n\n"
-							+ "Thank you,"
+							+ "Thank you,\n\n"
 							+ "MyDentist Dental Care";
 
 		

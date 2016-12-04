@@ -39,8 +39,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import myDentist.model.Appointments;
 import myDentist.model.Doctor;
@@ -88,10 +90,50 @@ public class UserController {
 	
 	
 	@RequestMapping(value="/PatientRegistration.html", method=RequestMethod.GET)
-	public String PatientRegistration(ModelMap models)
+	public ModelAndView PatientRegistration(ModelMap models)
 	{	
 		models.put("user", new User());
-		return "PatientRegistration";
+		return new ModelAndView("PatientRegistration");
+	}
+	
+	@RequestMapping(value="/PatientRegistrationAJAX.html", method=RequestMethod.GET)
+	@ResponseBody
+	public String Patientajax(ModelMap models,@RequestParam String userEmail)
+	{	
+		//for email
+		Boolean check=true;
+		List<User> userCheck=userDao.getUsers();
+		for (User u2 : userCheck) {
+			if(u2.getUserEmail().equals(userEmail))
+			{
+				check=false;
+				System.out.println("boolean is "+check.toString());
+			}
+		}
+		if(!check){
+			return "Email already Exists";
+		}
+		return " ";
+	}
+	
+	@RequestMapping(value="/PatientRegistrationusernameAJAX.html", method=RequestMethod.GET)
+	@ResponseBody
+	public String PatientUsernameajax(ModelMap models,@RequestParam String userName)
+	{	
+		//for user name
+		Boolean check=true;
+		List<User> userCheck=userDao.getUsers();
+		for (User u2 : userCheck) {
+			if(u2.getUsername().equals(userName))
+			{
+				check=false;
+				System.out.println("boolean is "+check.toString());
+			}
+		}
+		if(!check){
+			return "Username already Exists";
+		}
+		return " ";
 	}
 	
 	@RequestMapping(value="/PatientRegistration.html", method=RequestMethod.POST)
@@ -150,21 +192,49 @@ public class UserController {
 	@RequestMapping(value="/doctorRegistration.html", method=RequestMethod.POST)
 	public String doctorRegistration(ModelMap models, @ModelAttribute ("User") User user, BindingResult result)
 	{	
+	
 		try{
-		user.setUserType("doctor");
-		// save user to database
-		Integer id=user.getUserId();
-		Set<String> roles =new HashSet<String>();
-		roles.add("ROLE_DOCTOR");
-		user.setRoles(roles);
-		user=userDao.saveUser(user);		
-		System.out.println("Data saved in db :"+user.getUsername());
-		//redirect to display page
-		return "redirect:/users/Home.html?userid="+id;
-		}catch (Exception e) {
-			models.put("uniqueUsername", "Username already exists..");
-			return "redirect:doctorRegistration.html";
-		}
+			Boolean check=true;		
+			List<User> userCheck=userDao.getUsers();
+			for (User u2 : userCheck) {
+				if(u2.getUserEmail().equals(user.getUserEmail()))
+				{
+					check=false;
+					System.out.println("boolean is "+check.toString());
+				}
+			}
+
+			if(check){	
+					user.setUserType("doctor");
+					// save user to database
+					Integer id=user.getUserId();
+					Set<String> roles =new HashSet<String>();
+					roles.add("ROLE_DOCTOR");
+					user.setRoles(roles);
+					user=userDao.saveUser(user);		
+					System.out.println("Data saved in db :"+user.getUsername());
+					//redirect to display page	
+					return "redirect:/users/Home.html?userid="+user.getUserId();
+			}else{
+				models.put("uniqueEmailId", "Email already exists..Try with Different one");
+				return "redirect:doctorRegistration.html";
+			}
+			}catch (Exception e) {
+				  if (e instanceof JpaSystemException) {
+				        // Duplicate entry
+					  System.out.println("unique :"+e.getMessage());				  
+						//for unique user name
+					  	models.put("uniqueUsername", "Username already exists..");
+						//models.put("uniqueEmailId", "Username already exists..");
+				  } 
+				  else 
+				  {
+					 // models.put("uniqueEmailId", "Email already exists..Try with Different one");
+				        // Other SQL Exception
+					  	System.out.println("unique2 :"+e.getMessage());
+				  }
+				  return "redirect:doctorRegistration.html";
+			}	
 	}
 	
 	@RequestMapping(value="/editPatient.html", method=RequestMethod.GET)
@@ -221,17 +291,30 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/setScheduleDoctor.html",method=RequestMethod.GET)
-	public String setSDoctor(ModelMap models, @RequestParam Integer userid)	{
-		
+	public String setSDoctor(ModelMap models, @RequestParam Integer userid,  @RequestParam(required=false) Integer nextweek)	{
+		//add 14 days to list
 		Calendar now = Calendar.getInstance();
 	    SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 	    String[] days = new String[7];
+	    String[] days2 = new String[7];
 	    int delta = -now.get(GregorianCalendar.DAY_OF_WEEK) + 2; 
-	    for (int i = 0; i < 7; i++)
+	    int r=0;
+	    for (int i = 0; i < 14; i++)
 	    {
-	        days[i] = format.format(now.getTime());
+	    	if(i<7){
+	    		days[i] = format.format(now.getTime());
+	    	}
+	    	else{	    		
+	    		System.out.println(r);
+	    		days2[r] = format.format(now.getTime());
+	    		r++;
+	    	}
 	        now.add(Calendar.DATE, 1);
+	        
 	    }
+		//
+		if(nextweek==1){
+		
 	    System.out.println(Arrays.toString(days));
 	    models.put("dates", days);
 	    models.put("userid", userid);
@@ -251,25 +334,81 @@ public class UserController {
 			}
 			models.put("hashset", dc);
 			//
-		 	
+		}else{
+			models.put("dates", days2);
+		    models.put("userid", userid);
+		    java.util.List<String> slots=Arrays.asList("9-10","10-11","11-12","12-1","1-2","2-3","3-4","4-5");
+		    models.put("slots",slots);
+				//look for previous records
+				List<Boolean> bslot=new ArrayList<>();
+				HashMap<String, List<Boolean>> dc = new HashMap<String, List<Boolean>>();
+				dc.put("date", bslot);
+				List<MakeAvailability> make=makeAvailabilityDao.getAvailabilities();
+				for (MakeAvailability mA : make) {
+					if(mA.getDoctorId().getUserId().getUserId().equals(userid)&& Arrays.asList(days2).contains(mA.getAvailableDate())){	
+						bslot=Arrays.asList(mA.isSlot910(),mA.isSlot1011(),mA.isSlot1112(),mA.isSlot121(),
+								mA.isSlot12(),mA.isSlot23(),mA.isSlot34(),mA.isSlot45());
+						dc.put(mA.getAvailableDate(), bslot);
+					}
+				}
+				models.put("hashset", dc);
+		    System.out.println("2:  "+Arrays.toString(days2));
+		} 	
 		return "setScheduleDoctor";
+		
 	}
 	
 	@RequestMapping(value="/setScheduleDoctor.html", method=RequestMethod.POST)
-	public String setSDoctor(@RequestParam java.util.List<String> getindex, @RequestParam Integer userid, ModelMap models)	{
+	public String setSDoctor(@RequestParam java.util.List<String> getindex,  @RequestParam Integer week,@RequestParam Integer userid, ModelMap models)	{
 		
 		System.out.println("result is"+getindex);
 		java.util.List<String> slots=new ArrayList<String>();
 		 java.util.List<String> slotsnew=new ArrayList<String>();
 		 List<Doctor> doc=doctorDao.getDoctorbyUserId(userid);
+		 //calendar functions
+		 Calendar now = Calendar.getInstance();
+		    SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+		    String[] days = new String[7];
+		    String[] days2 = new String[7];		 
+		    int r=0;
+		    for (int i = 0; i < 14; i++)
+		    {
+		    	if(i<7){
+		    		days[i] = format.format(now.getTime());
+		    	}
+		    	else{	    		
+		    		System.out.println(r);
+		    		days2[r] = format.format(now.getTime());
+		    		r++;
+		    	}
+		        now.add(Calendar.DATE, 1);
+		        
+		    }
 		 //uncheck 
-		 List<MakeAvailability> mk= makeAvailabilityDao.getAvailabilities();
-		 for (MakeAvailability makeAvailability : mk) {
-			if(makeAvailability.getDoctorId().getDoctorId().equals(doc.get(0).getDoctorId())){
-				makeAvailabilityDao.removeAvailability(makeAvailability.getmId());
-			}
-		}
-		 //		
+		 if(week==1){
+			 List<MakeAvailability> mk= makeAvailabilityDao.getAvailabilities();
+			 for (MakeAvailability makeAvailability : mk) {
+				 if(Arrays.toString(days).contains(makeAvailability.getAvailableDate()))
+				 {
+					if(makeAvailability.getDoctorId().getDoctorId().equals(doc.get(0).getDoctorId())){
+						makeAvailabilityDao.removeAvailability(makeAvailability.getmId());
+					}
+				}
+			 }
+		 }else
+		 {//for next week=2
+			 List<MakeAvailability> mk= makeAvailabilityDao.getAvailabilities();
+			 for (MakeAvailability makeAvailability : mk) {
+				 if(Arrays.toString(days2).contains(makeAvailability.getAvailableDate()))
+				 {
+					if(makeAvailability.getDoctorId().getDoctorId().equals(doc.get(0).getDoctorId())){
+						makeAvailabilityDao.removeAvailability(makeAvailability.getmId());
+					}
+				}
+			 }
+		 }
+		 //
+		 
 		 for (String g : getindex) {
 			
 			try{

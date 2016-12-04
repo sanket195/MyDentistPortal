@@ -54,17 +54,41 @@ $(document).ready(function(){
     	  var selchb = getSelectedChbox(this.form);     // gets the array returned by getSelectedChbox()
     	 // alert(selchb);
     	}
+    $("#select").change(function(){
+		if($(this).prop("checked"))
+			$(":checkbox").prop("checked",true);
+		else
+			$(":checkbox").prop("checked",false);
+	});
+	$("#hide").click(function(){
+		$(":checked").filter(function(){
+			return $(this).attr("id") != "select";
+		}).closest("tr").hide();
+	});
 });
 </script>
 <br><br>
+
+<form action="setScheduleDoctor.html" method="get">
+	<div class="container">
+	<c:if test="${param['nextweek'] eq 1}">	
+		<a href="/myDentist/setScheduleDoctor.html?nextweek=2&userid=${userid}">Set Schedule For Next Week</a>
+		
+	</c:if>
+	<c:if test="${param['nextweek'] ne 1}">
+		<a href="/myDentist/setScheduleDoctor.html?nextweek=1&userid=${userid}">Current Week</a>
+	</c:if>
+	</div>
+	</form>
 <form action="setScheduleDoctor.html" method="post">
 <div id="result"> 
+	
 	<div align="center">Set Schedule</div>
     <br/>
     <table  id="myTable" border="1" style="border-collapse: collapse;" align="center" cellpadding="1">
         <!--1st ROW-->
        <tr>
-       <th></th>
+       <th style="padding-left: 25px;"><input id="select" type="checkbox" /></th>
        <c:forEach items="${dates}" var="date">
         <th>${date}</th>
         </c:forEach>
@@ -117,6 +141,7 @@ $(document).ready(function(){
     </div>
     <input type="hidden" id="rs" name="getindex" style="width: 500px">
    	<input type="hidden" name="userid" value="${userid}">
+   	<input type="hidden" name="week" value="${param['nextweek']}">
    
     </form>
 <br><br>

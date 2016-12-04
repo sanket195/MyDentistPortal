@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import myDentist.model.Appointments;
 import myDentist.model.Doctor;
@@ -42,7 +44,7 @@ public class doctorController {
 	private patientDao patientDao;
 	
 	@RequestMapping(value="/users/Home.html",method=RequestMethod.GET)
-	public String doctorH(ModelMap models)
+	public ModelAndView doctorH(ModelMap models)
 	{
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
@@ -67,19 +69,27 @@ public class doctorController {
 		}
 		//System.out.println("mmm"+);
 		System.out.println("user 1"+currentPrincipalName);
-		return "/users/Home";
+		return new ModelAndView("/users/Home");
 	}
 	
 	@RequestMapping(value="/users/Home.html",method=RequestMethod.POST)
 	public String doctorH(@RequestParam Integer userid,@RequestParam (required=false) Integer aptid)
 	{
 		System.out.println("user 2"+userid);
+		return "redirect:/users/Home.html?userid="+userid;
+	}
+	
+	@RequestMapping(value="/users/CancelAptAJAX.html", method=RequestMethod.POST)
+	@ResponseBody
+	public String Patientajax(ModelMap models,@RequestParam Integer userid,@RequestParam (required=false) Integer aptid)
+	{	
 		if(aptid!=null){
 			Appointments ap =appointmentsDao.getAppointmentbyAptid(aptid);
 			appointmentsDao.deleteAppointments(ap);
 		}
-		return "redirect:/users/Home.html?userid="+userid;
+		return "";
 	}
+	
 	
 	@RequestMapping(value="/doctorHome.html",method=RequestMethod.GET)
 	public String doctorHome(ModelMap models,@RequestParam Integer userid)

@@ -25,7 +25,7 @@
 	$(function() {
 		$("#datepicker").datepicker({
 			minDate : 0,
-			maxDate : "+6D"
+			maxDate : "+13D"
 		});
 	});
 </script>
@@ -59,7 +59,7 @@ body {
 					<tr>
 						<td><label for="doctorId"> Doctor's Name :</label></td>
 						<td><select id="doctorId" name="doctorId"
-							class="form-control" style="width: 200px">
+							class="form-control" style="width: 200px" required="required">
 								<option>Select Doctor</option>
 								<c:forEach items="${doctors}" var="d">
 									<c:if test="${doctorid eq d.doctorId}">
@@ -74,7 +74,7 @@ body {
 						<td><label for="appointmentDate"> Appointment Date :</label></td>
 						<td><p>
 								<input type="text" id="datepicker" name="appointmentDate"
-									value="${appointmentDate}">
+									value="${appointmentDate}" required="required">
 							</p></td>
 					</tr>
 				</table>
@@ -125,20 +125,21 @@ body {
 					</div>
 				</c:when>
 				<c:otherwise>
-				
+				<c:if test="${param['noslot'] eq 'No slot Available'}">
 					<script type="text/javascript">
 						$(function(){
 							var btn=document.getElementById("submit"); 
-							btn.disabled=false;
+							btn.disabled=true;
 						});
 					</script>
-					
+					</c:if>
 					<p style="color: red;">${param['noslot']}</p>
 				
-					<a href="/myDentist/appointment/appointment.html?userid=${userid}">Take
-						Different Time Slot</a>
+					
 				</c:otherwise>
 			</c:choose>
+			<a href="/myDentist/appointment/appointment.html?userid=${userid}">Take
+						Different Time Slot</a>
 		</form:form>
 
 	</div>

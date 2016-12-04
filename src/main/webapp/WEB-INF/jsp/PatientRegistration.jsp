@@ -1,4 +1,29 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<script
+  src="https://code.jquery.com/jquery-2.2.4.js"></script>
+<script> 
+$(function(){
+	$('#userEmail').keyup(function(){
+		$.ajax('PatientRegistrationAJAX.html',{
+			cache:false,
+			data: {
+				userEmail: $("#userEmail").val()
+            },
+			success:function(data){$('#emailcheck').html(data)}
+		});
+	});
+	
+	$('#username').keyup(function(){
+		$.ajax('PatientRegistrationusernameAJAX.html',{
+			cache:false,
+			data: {
+				userName: $("#username").val()
+            },
+			success:function(data){$('#usercheck').html(data)}
+		});
+	});
+});
+</script>
 <div class="container">
     <div class="row" >
         <form:form modelAttribute="user">
@@ -8,7 +33,7 @@
                 	<tr>
                 		<td><label for="UserName">Username</label></td>
                 		<td><spring:bind path="username"><input type="text" class="form-control" name="username" id="username" placeholder="Enter username" required>
-                    	</spring:bind><p style="color: red;">${param['uniqueUsername']}</p></td>
+                    	</spring:bind><div id="usercheck" style="color: red;"></div></td>
                 	</tr>
                 	<tr>
                 		<td><label for="password">Password</label></td>
@@ -17,8 +42,8 @@
                 	</tr>
                 	<tr>
                 		<td><label for="userEmail">Enter Email ID</label></td>
-                		<td><spring:bind path="userEmail"><input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter Email" required>
-                		</spring:bind><p style="color: red;">${param['uniqueEmailId']}</p></td>
+                		<td><div id="emailcheck" style="color: red;"></div><spring:bind path="userEmail"><input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter Email" required>
+                		</spring:bind></td>
                 	</tr>
                 	<tr>
                 		<td><label for="userAddress">Enter Address</label></td>

@@ -1,6 +1,8 @@
 package myDentist.web.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -93,27 +95,53 @@ public class appointmentController {
 	
 	
 	@RequestMapping(value="/appointment/appointment.html",method=RequestMethod.POST)
-	public String takeAppointment(@RequestParam Integer userid,@RequestParam(required=false) Integer doctorId,@RequestParam(required=false) Integer doctorid, @RequestParam String appointmentDate,ModelMap models,@RequestParam(required=false) String appointmentTime,@RequestParam(required=false) String slot)
+	public String takeAppointment(ModelMap models,@RequestParam Integer userid,@RequestParam(required=false) Integer doctorId,@RequestParam(required=false) Integer doctorid, @RequestParam String appointmentDate,@RequestParam(required=false) String appointmentTime,@RequestParam(required=false) String slot,
+			@RequestParam(required=false) String from,@RequestParam(required=false) String to)
 	{		
 		if(appointmentTime!=null&&appointmentDate!="Select slot"){
-		System.out.println("Doctor ID is :"+doctorid+"||||| Selected date is : "+appointmentDate);
-		Appointments apt=new Appointments();
-		models.put("userid", userid);
-		System.out.println("selected slot = "+appointmentTime);
-		Doctor d=doctorDao.getDoctor(doctorid);
-		User u=userDao.getUser(userid);
-		apt.setDoctorId(d);
-		apt.setUserId(u);
-		models.put("noslot", "No slot Available");	
-		apt.setAppointmentTime(appointmentTime);
-		apt.setAppointmentDate(appointmentDate);
-		//System.out.println("value is :"+appointment.getAppointmentDate());
-		appointmentsDao.saveAppointment(apt);
+			System.out.println("Doctor ID is :"+doctorid+"||||| Selected date is : "+appointmentDate);
+			Appointments apt=new Appointments();
+			models.put("userid", userid);
+			System.out.println("selected slot = "+appointmentTime);
+			Doctor d=doctorDao.getDoctor(doctorid);
+			User u=userDao.getUser(userid);
+			apt.setDoctorId(d);
+			apt.setUserId(u);
+			models.put("noslot", "No slot Available");	
+			apt.setAppointmentTime(appointmentTime);
+			apt.setAppointmentDate(appointmentDate);
+			//System.out.println("value is :"+appointment.getAppointmentDate());
+			appointmentsDao.saveAppointment(apt);
 		
 		return "redirect:/users/Home.html?userid="+userid;
 		}
 		else{
+			List<MakeAvailability> senddate=new ArrayList<MakeAvailability>();
+			
 			try{
+				//for date range
+				/*
+				List<MakeAvailability> mkdate= availabilityDao.getAvailabilities();
+				Doctor d1=doctorDao.getDoctor(doctorId);
+				  SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+				Date frm= formatter.parse(from);
+				for (MakeAvailability makeAvailability : mkdate) {
+					Date to1=formatter.parse(to);
+					Date date=formatter.parse(makeAvailability.getAvailableDate());
+					 long diff1 = frm.getTime() - date.getTime();
+					 long diff2 = to1.getTime() - date.getTime();
+					 int diffDays = (int) (diff1 / (24 * 60 * 60 * 1000));
+					 int diffDays2 = (int) (diff2 / (24 * 60 * 60 * 1000));
+					 System.out.println("date difference="+makeAvailability.getAvailableDate()+"diff:"+diffDays+":-- "+diffDays2);
+					 if(diffDays<0 &&diffDays2>0&&d1.getDoctorId().equals(makeAvailability.getDoctorId().getDoctorId())){
+		
+						senddate.add(availabilityDao.getAvailabilities().get(0));
+						System.out.println("send"+senddate);
+					}
+					
+				}
+				*/
+				//
 			List<String> slots=new ArrayList<String>();
 			Doctor d=doctorDao.getDoctor(doctorId);
 			MakeAvailability doc = new MakeAvailability();
@@ -142,6 +170,7 @@ public class appointmentController {
 						slots.remove(appointments.getAppointmentTime()); 
 					}
 			}
+			
 			models.put("noslot", "No slot Available");	
 			models.put("userid", userid);
 			System.out.println("LIST"+slots);
@@ -150,8 +179,9 @@ public class appointmentController {
 			models.put("doctorId2", doctorId);
 			System.out.println("POST doctor "+doctorId);
 			}
-			catch (Exception e) {
+				catch (Exception e) {
 			}
+			//models.put("senddate", senddate);
 			models.put("userid", userid);
 			return "redirect:/appointment/appointment.html?userid="+userid;
 		}
@@ -266,6 +296,7 @@ public class appointmentController {
 		}
 		return "redirect:SetSchedule.html";
 	}
-			////NO USE ///
+
+	
 
 }

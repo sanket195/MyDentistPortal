@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
     <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -31,7 +31,31 @@
 			});
 		});
 </script>
-<!--//end-smooth-scrolling-->	
+<!--//end-smooth-scrolling-->
+<script type="text/javascript">
+$(function(){
+	var userId = ${userid};	 
+	$("input[name='Delete']").click(function(){
+		var apt =$(this).closest("tr").attr("data-apt-id");	 
+		$.ajax('CancelAptAJAX.html?userid='+userId+'&aptid='+apt,{
+			cache:false,
+			method: "POST",
+			context: $(this),
+			data: {
+				userid: userId,
+				aptid: apt
+            },
+			success:function(data){
+				$(this).closest("tr").remove();
+			}
+		});
+		
+	});
+	
+	
+});
+</script>
+	
 </head>
 <body>
 	<!--header-->
@@ -140,7 +164,7 @@
           <a data-toggle="collapse" href="#collapse2"><h4>Manage your Appointments</h4></a>
         </h5>
       </div>
-      <div id="collapse2" class="panel-collapse collapse">
+      <div id="collapse2">
         <div class="panel-body">
         Haven't schedule your appointment! Here's your chance to do it!
         <a href="/myDentist/appointment/appointment.html?userid=${userid}">Appointment</a>
@@ -161,18 +185,19 @@
   		<c:forEach items="${appointments}" var="apt">
         <c:if test="${apt.userId.userId eq userid}" >
         <tbody>
-        <tr>
+        <tr data-apt-id="${apt.appointmentId}" >
         <td>${apt.appointmentId}</td>
         <td>${apt.appointmentDate}</td>
         <td>${apt.appointmentTime}</td>
         <td>${apt.doctorId.doctorId}</td>
         <td>${apt.doctorId.doctorName}</td>
         <td><a href="/myDentist/users/rescheduleAppointment.html?id=${apt.appointmentId}&doctorid=${apt.doctorId.doctorId}&&appointmentDate=${apt.appointmentDate}">Edit My appointment</a></td>
-        <td><form action="Home.html" method="post">
-        <input style="color: black;" type="submit" name="Delete" value="Cancel Appointment">
+        <td>
+        <input style="color: black;" type="submit" name="Delete" class="delete" value="Cancel Appointment">
         <input type="hidden" name="aptid" value="${apt.appointmentId}">
         <input type="hidden" name="userid" value="${userid}">
-        </form></td>
+        <c:set var="aapt" scope="application" value="${apt.appointmentId}"></c:set>
+        </td>
         </tr>  
         </tbody>      
         </c:if>
@@ -259,7 +284,7 @@
       </div>
       <div id="collapse3" class="panel-collapse collapse">
         <div class="panel-body">Set your appointment schedule for the next one week</div>
-        <div class="panel-footer"><a href="/myDentist/setScheduleDoctor.html?userid=${userid}">setSchedule</a></div>
+        <div class="panel-footer"><a href="/myDentist/setScheduleDoctor.html?nextweek=1&userid=${userid}">setSchedule</a></div>
       </div>
     </div>
  
@@ -280,7 +305,7 @@
         <th>Operations</th>
         </tr>
   		<c:forEach items="${appointments}" var="apt">
-        <c:if test="${apt.doctorId.doctorId eq doctorid && apt.appointmentDate eq tomorrow}" >
+        <c:if test="${apt.doctorId.doctorId eq doctorid && apt.appointmentDate > tomorrow}" >
         <tr>
         
 		<td>${apt.appointmentDate}</td>
