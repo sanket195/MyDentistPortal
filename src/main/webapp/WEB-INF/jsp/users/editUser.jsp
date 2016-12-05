@@ -13,7 +13,6 @@
 				<th>Type</th>
 				<th></th>
 			</tr>
-
 			<tr>
 				<td>${alluser.userId}</td>
 				<td>${alluser.userEmail}</td>
@@ -23,7 +22,10 @@
 					</c:if> <c:if test="${alluser.enabled eq false}">
 						<input type="submit" name="Enable" value="Enable">
 						<input type="hidden" value="${userid}" id="userid" name="userid">
-					</c:if></td>
+						
+					</c:if>
+					<input type="hidden" value="${alluser.userId}" id="usr" name="usr">
+					</td>
 
 			</tr>
 

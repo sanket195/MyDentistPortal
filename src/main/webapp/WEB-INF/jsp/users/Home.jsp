@@ -54,6 +54,8 @@ $(function(){
 	
 	
 });
+
+
 </script>
 	
 </head>
@@ -216,8 +218,8 @@ $(function(){
         <div class="panel-body">
         <table class="table table-striped">
         <tbody>
-        <tr>
-        <th>${users.userId}</th>
+        <tr id="users">
+        <th data-field="id">${users.userId}</th>
         <th>${users.username}</th>
         <th>${users.userEmail}</th>
         <th>${users.userAddress}</th>
@@ -225,8 +227,87 @@ $(function(){
         </tr>
         </tbody>
         </table>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		 <script>
+			  $( function() {
+				  
+				  function editUser(){
+						var userId = ${userid};
+					    $.ajax({
+					        url: "/myDentist/editPatientAJAX.html",
+					        data: {
+								userid: userId
+				            },
+					        dataType: "json",
+					        success: function(data) {
+					        	 $("#user-edit input[data-field='contact']").val(data.userContact);
+					            $("#user-edit input[data-field='email']").val(data.userEmail);
+					            $("#user-edit input[data-field='address']").val(data.userAddress);
+					        }
+					    });
+					    $("#user-edit").dialog("open");
+					}  
+				  
+				  function updateUser(){
+						var userId = ${userid};
+						 $.ajax({
+						        url: "/myDentist/editPatientAJAX.html",
+						        method: "PUT",
+						        dataType: "json",
+						        processData: false,
+						        contentType: "application/json",
+						        data:JSON.stringify({
+						        	userId:userId,
+						        	userContact: $("#user-edit input[name='contact']").val(),
+						        	userEmail: $("#user-edit input[name='email']").val(),
+						        	userAddress: $("#user-edit input[name='address']").val()
+						        }),
+						        success: function(data){
+						        	
+						        	$("#users").replaceWith("<tr id='users'>"+					        			
+						        			 "<th>"+data.userId+"</th>"+
+						        		        "<th>"+data.username+"</th>"+
+						        		        "<th>"+data.userEmail+"</th>"+
+						        		        "<th>"+data.userAddress+"</th>"+
+						        		        "<th>"+data.userContact+"</th></tr>"						        		        
+						        			);
+						          						           
+						        }
+						    });
+					}
+				  
+			   
+				$(".edit").click(editUser);
+			  
+			    $("#user-edit").dialog({
+					autoOpen: false,
+				    buttons: {
+				        "Save": function(){
+				            
+				            updateUser();
+				            $(this).dialog( "close" );
+				 
+				        }
+				    }
+				});
+			  
+			  });
+		  </script>	
         </div>
-        <div class="panel-footer"><a href="/myDentist/editPatient.html?userid=${userid}">Edit Profile Here</a></div>
+        	<div id="user-edit" title="Edit User">
+        	
+  				<table>
+				  <tr><th></th><td><input name="idnew" data-field="id" type="hidden"/></td></tr>
+				  <tr><th>Contact</th><td ><input name="contact" data-field="contact" type="text" /></td></tr>
+				  <tr><th>Email</th><td><input name="email" data-field='email' type="text" /></td></tr>
+				  <tr><th>Address</th><td><input name="address" data-field='address' type="text" /></td></tr>
+				</table>
+			
+			</div>
+        <div class="panel-footer"><a class="edit" href="javascript:void(0)">Edit Profile Here</a></div>
         <div class="panel-footer"><a href="/myDentist/users/changePassword.html?userid=${userid}">Change Password</a></div>
       </div>
     </div>
@@ -364,6 +445,108 @@ $(function(){
         </div>
       </div>
     </div>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"> </script>
+ <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> </script>
+
+  <script type="text/javascript">
+
+	  $(function() {
+		  //
+		   $.widget( "custom.catcomplete", $.ui.autocomplete, {
+	      _create: function() {
+	        this._super();
+	        this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+	      },
+	      _renderMenu: function( ul, items ) {
+	        var that = this,
+	          currentCategory = "";
+	        $.each( items, function( index, item ) {
+	          var li;
+	          if ( item.category != currentCategory ) {
+	            ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+	            currentCategory = item.category;
+	          }
+	          li = that._renderItemData( ul, item );
+	          if ( item.category ) {
+	            li.attr( "aria-label", item.category + " : " + item.label );
+	          }
+	        });
+	      }
+	    });
+		  //
+		  //
+		  var add;
+		  var taggs=[
+		             "ActionScript",
+		             "AppleScript",
+		             "Asp",
+		             "BASIC"
+		           ];
+		  $('#searchUsers').catcomplete({
+			  messages: {
+			        noResults: '',
+			        results: ''
+			    },
+			    delay: 500,
+			  source:function(request, response) {
+				  var data1;
+				  $.ajax('../userajax.html',{
+					cache:false,
+					dataType: "json",
+					data: {
+						term: $("#searchUsers").val()
+		            },
+					success:function(data)
+						{
+							 response($.map(data, function (value, key) {
+					                return {
+					                    label: value.username,
+					                    category:value.userType
+					                };
+					            }));
+						}
+			    	});
+			  	}
+			}); 
+		//after autocomplete 			     
+		  
+	  });
+	  	  
+	  function setvalue() {
+		  
+		  var v=$("input[name=searchUsers]").val();
+		  $("#username").val(v);
+		}
+		 
+  </script>
+  <style>
+  .ui-autocomplete-category {
+  font-weight: bold;
+  padding: .2em .4em;
+  margin: .8em 0 .2em;
+  line-height: 1.5;
+ }
+  .ui-autocomplete {
+    max-height: 100px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    background-color: #ffffff;
+     border-color: #ccc;
+    border-color: rgba(0, 0, 0, 0.2);
+    border-style: solid;
+    *border-right-width: 2px;
+    *border-bottom-width: 2px;
+    width: 50px;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 100px;
+    width: 50px;
+  }
+  </style>
   
   <div class="panel panel-default">
       <div class="panel-heading">
@@ -372,17 +555,18 @@ $(function(){
         </h4>
       </div>
       <div id="collapse3" class="panel-collapse collapse">
-         <table border="1">
-        	<tr><th>User ID</th><th>User Email</th><th>Type</th><th></th></tr>
-        	<c:forEach items="${alluser}" var="usr">
-        	<tr>
-        	<td>${usr.userId}</td>
-        	<td>${usr.userEmail}</td>
-        	<td>${usr.userType}</td>
-        	<td><a href="/myDentist/users/editUser.html?userid=${usr.userId}">Enable/Disable User</a></td>
-        	</tr>        
-        	</c:forEach>
-        </table>
+        <form  method="get" action="/myDentist/users/editUser.html">
+        <div>
+        	<br/>
+			<label for="searchUsers">Search For Users: </label>
+			<input id="searchUsers" name="searchUsers" onchange="setvalue()">
+			<input type="hidden" name="username" id="username" >
+			<input type="hidden" name="userid" id="userid" value="${userid}">
+			<input type="submit">
+			<br/><br/><br/>
+		
+		</div>
+	
       </div>
     </div>
 <br>

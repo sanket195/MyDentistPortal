@@ -36,6 +36,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,6 +44,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.google.gson.Gson;
 
 import myDentist.model.Appointments;
 import myDentist.model.Doctor;
@@ -258,20 +261,50 @@ public class UserController {
 		return "redirect:/users/Home.html?userid="+userid;
 	}
 	
-	@RequestMapping(value="/users/editUser.html", method=RequestMethod.GET)
-	public String editUser(ModelMap models,@RequestParam Integer userid)
+	@RequestMapping(value = "/editPatientAJAX.html", method = RequestMethod.GET)
+    @ResponseBody
+    public String getUser( @RequestParam Integer userid, ModelMap models )
+    {
+        
+        return new Gson().toJson(userDao.getUser( userid ));
+        
+    }
+	
+	@RequestMapping(value="/editPatientAJAX.html", method=RequestMethod.PUT)
+	@ResponseBody
+	public String editPatientAJAX(@RequestBody User user)
 	{	
-		User u=userDao.getUser(userid);
-		models.put("alluser", u);
-		models.put("userid", userid);
-		return "/users/editUser";
+		System.out.println("ajax edit user");
+		
+		User u=userDao.getUser(user.getUserId());		
+		u.setUsername(u.getUsername());
+		u.setUserContact(user.getUserContact());
+		u.setUserEmail(user.getUserEmail());
+		u.setUserAddress(user.getUserAddress());
+		userDao.saveUser(u);
+		return new Gson().toJson(u);
+	}
+	
+	@RequestMapping(value="/users/editUser.html", method=RequestMethod.GET)
+	public String editUser(ModelMap models,@RequestParam("searchUsers") String username,@RequestParam("userid") String userid)
+	{	
+		try{
+			//System.out.println("username is "+username);
+			User u=userDao.getUserByUsername(username);
+			models.put("alluser", u);
+			models.put("userid", u.getUserId());
+			return "/users/editUser";
+		}catch (Exception e) {
+			
+		}
+		return "redirect:/users/Home.html?userid="+userid;
 	}
 	
 
 	@RequestMapping(value="/users/editUser.html", method=RequestMethod.POST)
-	public String editUser(@RequestParam Integer userid,@RequestParam(required=false) String Enable,@RequestParam(required=false) String Disable)
+	public String editUser(@RequestParam Integer userid,@RequestParam("usr") Integer usr,@RequestParam(required=false) String Enable,@RequestParam(required=false) String Disable)
 	{	
-		User u=userDao.getUser(userid);
+		User u=userDao.getUser(usr);
 		if(Enable!=null){
 			u.setEnabled(true);
 			Set<String> roles =new HashSet<String>();
@@ -460,9 +493,22 @@ public class UserController {
 		return "/users/changePassword";
 	}
 	
+	@RequestMapping(value="/changePasswordAJAX.html", method=RequestMethod.GET)
+	@ResponseBody
+	public String changePasswordAJAX(ModelMap models,@RequestParam Integer userid,@RequestParam String prevPassword)
+	{	
+		System.out.println("previous password ="+prevPassword);
+		User u=userDao.getUser(userid);
+		if(prevPassword.equals(u.getPassword())){
+			return "";
+		}else{
+			return "Invalid Password";
+		}
+	}
+	
 	@RequestMapping(value="/users/changePassword.html", method=RequestMethod.POST)
 	public String changePassword(@RequestParam Integer userid,@RequestParam String inputPassword,@RequestParam String previousPassword)
-	{	
+	{			
 		User u=userDao.getUser(userid);
 		if(previousPassword.equals(u.getPassword())){
 			//System.out.println(previousPassword);

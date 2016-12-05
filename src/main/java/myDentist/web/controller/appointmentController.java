@@ -1,10 +1,13 @@
 package myDentist.web.controller;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.omg.CORBA.Request;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.google.gson.Gson;
 
 import myDentist.model.Appointments;
 import myDentist.model.Doctor;
@@ -44,6 +51,7 @@ public class appointmentController {
 	
 	@Autowired
 	private patientDao patientDao;
+	
 	
 	@RequestMapping(value="/PatientHome.html", method=RequestMethod.GET)
 	public String PatientHom(ModelMap models,@RequestParam Integer userid)
@@ -119,28 +127,7 @@ public class appointmentController {
 			List<MakeAvailability> senddate=new ArrayList<MakeAvailability>();
 			
 			try{
-				//for date range
-				/*
-				List<MakeAvailability> mkdate= availabilityDao.getAvailabilities();
-				Doctor d1=doctorDao.getDoctor(doctorId);
-				  SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-				Date frm= formatter.parse(from);
-				for (MakeAvailability makeAvailability : mkdate) {
-					Date to1=formatter.parse(to);
-					Date date=formatter.parse(makeAvailability.getAvailableDate());
-					 long diff1 = frm.getTime() - date.getTime();
-					 long diff2 = to1.getTime() - date.getTime();
-					 int diffDays = (int) (diff1 / (24 * 60 * 60 * 1000));
-					 int diffDays2 = (int) (diff2 / (24 * 60 * 60 * 1000));
-					 System.out.println("date difference="+makeAvailability.getAvailableDate()+"diff:"+diffDays+":-- "+diffDays2);
-					 if(diffDays<0 &&diffDays2>0&&d1.getDoctorId().equals(makeAvailability.getDoctorId().getDoctorId())){
-		
-						senddate.add(availabilityDao.getAvailabilities().get(0));
-						System.out.println("send"+senddate);
-					}
-					
-				}
-				*/
+				
 				//
 			List<String> slots=new ArrayList<String>();
 			Doctor d=doctorDao.getDoctor(doctorId);

@@ -1,12 +1,15 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"> </script>
+ <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 <script type="text/javascript"
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css"></script>
 <!--  jQuery -->
 <script type="text/javascript"
 	src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-
+ <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <!-- Isolated Version of Bootstrap, not needed if your site already uses Bootstrap -->
 <link rel="stylesheet"
 	href="https://formden.com/static/cdn/bootstrap-iso.css" />
@@ -30,6 +33,20 @@
 	});
 </script>
 
+<!-- ------------------------------------------------------------------- -->
+<script type="text/javascript">
+
+var doctorsList = ${doctors};
+var doctorid = ${doctorId};
+var finalList = new Array();
+for(i=0;i<doctorsList.length;i++){
+	if(doctorid == doctorsList.doctorId){
+		finalList[i] = doctorsList.doctorName;
+	}
+}
+
+</script>
+<!-- ------------------------------------------------------------------- -->
 <style>
 body {
 	margin: 40px 10px;
@@ -66,10 +83,12 @@ body {
 										<option value="${d.doctorId}" selected>${d.doctorName}</option>
 									</c:if>
 									<option value="${d.doctorId}">${d.doctorName}</option>
+									<c:set var="doctorName" value="${d.doctorName}" scope="session"/>
 								</c:forEach>
-
 						</select></td>
-					</tr>
+						<!-- ------------------------------------------------------------------- -->
+
+					</tr>		
 					<tr>
 						<td><label for="appointmentDate"> Appointment Date :</label></td>
 						<td><p>
@@ -78,7 +97,10 @@ body {
 							</p></td>
 					</tr>
 				</table>
-
+						<div class="ui-widget">
+						
+						
+ 						</div>
 
 				<div class="form-group">
 					<input type="hidden" value="${userid}" name="userid" /> <input

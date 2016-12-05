@@ -2,6 +2,7 @@ package myDentist.web.controller;
 
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.google.gson.Gson;
 
 import myDentist.model.Appointments;
 import myDentist.model.Doctor;
@@ -73,11 +76,31 @@ public class doctorController {
 	}
 	
 	@RequestMapping(value="/users/Home.html",method=RequestMethod.POST)
-	public String doctorH(@RequestParam Integer userid,@RequestParam (required=false) Integer aptid)
+	public ModelAndView doctorH(@RequestParam Integer userid,@RequestParam (required=false) Integer aptid)
 	{
 		System.out.println("user 2"+userid);
-		return "redirect:/users/Home.html?userid="+userid;
+		return new ModelAndView("redirect:/users/Home.html?userid="+userid);
 	}
+	
+	//ajax user
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@RequestMapping(value="/userajax.html", method=RequestMethod.GET)
+		@ResponseBody
+		public String userajax(@RequestParam String term)
+		{	
+			System.out.println("this is ajax function");
+			List<User> u=userDao.getUsers();
+			List list = new ArrayList();
+			for (User user : u) {
+				if(user.getUsername().contains(term))
+				{
+					if(!user.getUserType().equals("admin")){
+						list.add(user);
+					}
+				}
+			}
+			 return new Gson().toJson(list);
+		}
 	
 	@RequestMapping(value="/users/CancelAptAJAX.html", method=RequestMethod.POST)
 	@ResponseBody
